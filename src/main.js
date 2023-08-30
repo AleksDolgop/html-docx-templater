@@ -15,7 +15,22 @@ function decodeUTF16LE(binaryStr) {
  * @returns {{[key: string]: string}[]}
  */
 function prepareCsv(csvBuffer) {
-    const csvDataText = new TextDecoder('utf-8', { fatal: true }).decode(csvBuffer)
+    let csvDataText 
+
+    const encoders = ['utf-8', 'macintosh', 'utf-16', 'cp1251', 'cp1250']
+
+    for (const encoding of encoders) {
+        if (!csvDataText) {
+            csvDataText = new TextDecoder(encoding, { fatal: true }).decode(csvFile)
+            break
+        }
+    }
+    
+    if (!csvDataText) {
+        alert('Invalid CSV file')
+        return
+    }
+    
     const csvParsed = csvDataText.split('\n').map(i => i.split(';'))
     const [csvTitle, ...csvItems] = csvParsed
     return csvItems.reduce((prev, cur) => {
@@ -58,15 +73,8 @@ function handle() {
     }
     run = true
     try {
-        try {
-            new TextDecoder('utf-8', { fatal: true }).decode(csvFile)
-        } catch {
-            alert('Неверная кодировка CSV, должна быть UTF-8')
-        }
-
         const preparedCsv = prepareCsv(csvFile)
         console.log('preparedCsv', preparedCsv)
-
 
         const zip = new PizZip(docFile);
         const templateDoc = new window.docxtemplater(zip, {
