@@ -16,7 +16,7 @@ function decodeUTF16LE(binaryStr) {
  */
 function prepareCsv(csvBuffer) {
     let csvDataText = null
-    const encoders = ['utf-8', 'macintosh', 'utf-16', 'cp1251', 'cp1250']
+    const encoders = ['utf-8', 'cp1251']
     for (const encoding of encoders) {
         if (!csvDataText) {
             try {
