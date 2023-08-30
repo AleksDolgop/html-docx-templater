@@ -15,13 +15,18 @@ function decodeUTF16LE(binaryStr) {
  * @returns {{[key: string]: string}[]}
  */
 function prepareCsv(csvBuffer) {
-    let csvDataText 
-
+    let csvDataText = null
     const encoders = ['utf-8', 'macintosh', 'utf-16', 'cp1251', 'cp1250']
-
     for (const encoding of encoders) {
         if (!csvDataText) {
-            csvDataText = new TextDecoder(encoding, { fatal: true }).decode(csvFile)
+            try {
+                csvDataText = new TextDecoder(encoding, { fatal: true }).decode(csvFile)
+            } catch {
+                csvDataText = null
+            }
+        }
+
+        if(typeof csvDataText === 'string') {
             break
         }
     }
