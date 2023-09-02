@@ -1,40 +1,13 @@
-function decodeUTF16LE(binaryStr) {
-  var cp = [];
-  for (var i = 0; i < binaryStr.length; i += 2) {
-    cp.push(binaryStr.charCodeAt(i) | (binaryStr.charCodeAt(i + 1) << 8));
-  }
-
-  return String.fromCharCode.apply(String, cp);
-}
 
 /**
- * @param {ArrayBuffer} textCsv
  * @returns {{[key: string]: string}[]}
+ * @param csvBuffer
+ * @param encoding
  */
-function prepareCsv(csvBuffer) {
-  let csvDataText = null;
-  const encoders = ["utf-8", "cp1251"];
-  for (const encoding of encoders) {
-    if (!csvDataText) {
-      try {
-        csvDataText = new TextDecoder(encoding, { fatal: true }).decode(
-          csvFile
-        );
-      } catch {
-        csvDataText = null;
-      }
-    }
-
-    if (typeof csvDataText === "string") {
-      break;
-    }
-  }
-
-  if (!csvDataText) {
-    alert("Invalid CSV file");
-    return;
-  }
-
+function prepareCsv(csvBuffer, encoding) {
+  const csvDataText = new TextDecoder(encoding).decode(
+      csvBuffer
+  );
   const csvParsed = csvDataText.split("\n").map((i) => i.split(";"));
   const [csvTitle, ...csvItems] = csvParsed;
   return csvItems
@@ -53,97 +26,130 @@ function prepareCsv(csvBuffer) {
     .slice(0, csvItems.length - 1);
 }
 
-/**
- *
- * @param {string} text
- * @returns {string[]}
- */
-function getTemplateFieldsFromText(text) {
-  return text.match(/\{[а-я\w_]+\}/gim);
-}
-
 let docFile;
 let csvFile;
 
-let run = false;
-function handle() {
-  console.log("Run handle");
-  console.log("docFile", !!docFile);
-  console.log("csvFile", !!csvFile);
-  if (!docFile || !csvFile) {
-    return;
-  }
-  if (run) {
-    return;
-  }
-  run = true;
-  try {
-    const preparedCsv = prepareCsv(csvFile);
-    console.log("preparedCsv", preparedCsv);
+const encodersList = ['cp1252', 'cp1251', 'utf-8', 'utf-16', 'macintosh']
+let encoding = 'cp1251'
 
-    const outputZip = new JSZip();
-    for (const index in preparedCsv) {
-      const item = preparedCsv[index];
+function prepareDocx(docBlob, csvPatch) {
+  const zip = new PizZip(docBlob);
+  const doc = new window.docxtemplater(zip, {
+    paragraphLoop: true,
+    linebreaks: true,
+  });
+  doc.render(csvPatch);
+  return doc.getZip().generate({
+    type: "blob",
+    mimeType:
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    compression: "DEFLATE",
+  });
+}
 
-      const zip = new PizZip(docFile);
-      const doc = new window.docxtemplater(zip, {
-        paragraphLoop: true,
-        linebreaks: true,
-      });
-
-      doc.render(item);
-
-      const blob = doc.getZip().generate({
-        type: "blob",
-        mimeType:
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        compression: "DEFLATE",
-      });
-      outputZip.file(`doc_${+index + 1}.docx`, blob);
-    }
-
-    const dateText = new Date()
+function prepareDate() {
+  return new Date()
       .toISOString()
       .split(".")[0]
-      .replace(/-|:/g, "_");
-
-    outputZip.generateAsync({ type: "blob" }).then(function (content) {
-      saveAs(content, `output${dateText}.zip`);
-    });
-  } finally {
-    run = false;
-  }
+      .replace(/[-:]/g, "_");
 }
 
 const docs = document.getElementById("doc");
-const csv = document.getElementById("csv");
-window.generate = function generate() {
-  const readerDoc = new FileReader();
-  const readerCsv = new FileReader();
-  if (docs.files.length === 0) {
-    alert("No docs file selected");
+docs.onchange = function (e) {
+  const files = e.target.files
+  if (files.length === 0) {
+    return
   }
-  readerDoc.readAsBinaryString(docs.files[0]);
+  const readerDoc = new FileReader();
+  readerDoc.readAsBinaryString(files[0]);
   readerDoc.onerror = function (evt) {
-    console.log("error reading file", evt);
-    alert("error reading doc file" + evt);
+    alert("Error reading doc file" + evt);
   };
   readerDoc.onload = function (evt) {
     docFile = evt.target.result;
-    handle();
   };
+}
 
-  if (csv.files.length === 0) {
-    alert("No csvs file selected");
+const selectEncoding = document.getElementById("csv-encoding");
+encodersList.map(enc => {
+  const option = document.createElement('option')
+  option.value = enc
+  option.text = enc
+  if (enc === encoding) {
+    option.selected = true
   }
 
-  readerCsv.readAsArrayBuffer(csv.files[0]);
+  selectEncoding.appendChild(option)
+})
+selectEncoding.onchange = function (e) {
+  encoding = e.target.value
+  console.log('Changed encoding to', encoding)
+}
+
+const csv = document.getElementById("csv");
+csv.onchange = function (e) {
+  const files = e.target.files
+  if (files.length === 0) {
+    return
+  }
+  const readerCsv = new FileReader();
+  readerCsv.readAsArrayBuffer(files[0]);
   readerCsv.onerror = function (evt) {
     console.log("error reading file", evt);
     alert("error reading csv file" + evt);
   };
   readerCsv.onload = function (evt) {
     csvFile = evt.target.result;
-    handle();
   };
+}
+
+/**
+ * @type {HTMLPreElement}
+ */
+const csvPreRaw = document.getElementById("csv-raw")
+window.readTitles = function readTitles() {
+  if (csv.files.length === 0) {
+    alert("No CSV file selected");
+    return
+  }
+
+  csvPreRaw.style.display = 'block'
+
+  csvPreRaw.innerText = new TextDecoder(encoding).decode(
+      csvFile
+  ).split('\n')[0]
+}
+
+window.generate = function generate(first = false) {
+  if (docs.files.length === 0) {
+    alert("No docx file selected");
+    return
+  }
+  if (csv.files.length === 0) {
+    alert("No CSV file selected");
+    return
+  }
+  const preparedCsv = prepareCsv(csvFile, encoding);
+  console.log("preparedCsv", preparedCsv);
+
+  if (preparedCsv.length === 0) {
+    alert(`CSV document have 0 lines`)
+    return;
+  }
+
+  if (first) {
+    const blob = prepareDocx(docFile, preparedCsv[0])
+    saveAs(blob, `output${prepareDate()}.docx`);
+    return
+  }
+
+  const outputZip = new JSZip();
+  for (const index in preparedCsv) {
+    const blob = prepareDocx(docFile, preparedCsv[index])
+    outputZip.file(`doc_${+index + 1}.docx`, blob);
+  }
+
+  outputZip.generateAsync({ type: "blob" }).then(function (content) {
+    saveAs(content, `output${prepareDate()}.zip`);
+  });
 };

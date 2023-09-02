@@ -1,0 +1,39 @@
+body {
+    width: 100%;
+    text-align: center;
+}
+
+#control-panel {
+    margin-top: 5%;
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    border: 1px solid black;
+    padding: 0.5em;
+}
+
+button {
+    width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.control-item {
+    margin-bottom: 0.5em;
+}
+
+.control-item:last-child {
+    margin-bottom: 0;
+}
+
+#csv-raw {
+    margin-top: 1%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 800px;
+    border: 1px solid black;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    display: none;
+}

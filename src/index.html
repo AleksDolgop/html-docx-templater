@@ -1,56 +1,42 @@
-<html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <title>Docx templater</title>
+        <link rel="icon" type="image/x-icon" href="./favicon.ico">
+        <link href="style.css" rel="stylesheet"/>
+    </head>
+    <body>
+        <script src="docxtemplater.js"></script>
+        <script src="pizzip.js"></script>
+        <script src="file-saver.js"></script>
+        <script src="pizzip-utuls.js"></script>
+        <script src="jszip.min.js"></script>
 
-<head>
-    <style>
-        body {
-            width: 100%;
-            text-align: center;
-        }
-        #control-panel {
-            margin-top: 10%;
-            width: 300px;
-            margin-left: auto;
-            margin-right: auto;
-            text-align: left;
-            border: 1px solid black;
-            padding: 0.5em;
-        }
-        button {
-            width: 300px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .control-item {
-            margin-bottom: 0.5em;
-        }
-        .control-item:last-child {
-            margin-bottom: 0;
-        }
-    </style>
-</head>
-
-<body>
-    <script src="docxtemplater.js"></script>
-    <script src="pizzip.js"></script>
-    <script src="file-saver.js"></script>
-    <script src="pizzip-utuls.js"></script>
-    <script src="jszip.min.js"></script>
-
-    <div id="control-panel">
-        <div class="control-item">
-            <label for="doc"></label>Docx document</br>
-            <input type="file" id="doc" /></br>
+        <div id="control-panel">
+            <div class="control-item">
+                <label for="doc">Docx document</label>
+                <input type="file" id="doc" />
+            </div>
+            <div class="control-item">
+                <label for="csv">Csv document</label>
+                <input type="file" id="csv" />
+            </div>
+            <div class="control-item">
+                <label for="csv-encoding">Csv encoding</label>
+                <select name="csv-encoding" id="csv-encoding" ></select>
+            </div>
+            <div class="control-item">
+                <button onclick="readTitles()">Read csv line</button>
+            </div>
+            <div class="control-item">
+                <button onclick="generate(true)">Generate first document</button>
+                <button onclick="generate()">Generate all documents</button>
+            </div>
         </div>
-        <div class="control-item">
-            <label for="csv"></label>Csv document</br>
-            <input type="file" id="csv" /></br>
+        <div id="csv-raw">
+            <pre></pre>
         </div>
-        <div class="control-item">
-            <button onclick="generate()">Submit</button>
-        </div>
-    </div>
 
-    <script src="main.js"></script>
-</body>
-
+        <script src="main.js"></script>
+    </body>
 </html>
