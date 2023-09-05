@@ -37,3 +37,7 @@ button {
     padding-bottom: 2%;
     display: none;
 }
+
+#output-file-template {
+    width: 100%;
+}

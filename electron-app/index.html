@@ -1,0 +1,62 @@
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" >
+        <link href="style.css" rel="stylesheet"/>
+        <title></title>
+    </head>
+    <body>
+        <div id="control-panel">
+            <div class="control-item">
+                <div id="chose-input-doc">
+                    <input
+                        type="radio"
+                        id="chose-input-doc-docx"
+                        name="chose-input-doc"
+                        onchange="selectDocType('docx')"
+                        checked
+                    />
+                    <label for="chose-input-doc-docx" >Docx</label>
+                    <input
+                        type="radio"
+                        id="chose-input-doc-excel"
+                        name="chose-input-doc"
+                        onchange="selectDocType('excel')"
+                    />
+                    <label for="chose-input-doc-excel" >Excel</label>
+                </div>
+            </div>
+            <div class="control-item">
+                <label id="label-doc-docx" for="doc">Docx document</label>
+                <label id="label-doc-excel" for="doc">Excel document</label>
+                <input type="file" id="doc" />
+            </div>
+            <div id="excel-control" class="control-item">
+                <label for="excel-sheet">Excel sheet</label>
+                <select name="excel-sheet" id="excel-sheet" ></select>
+            </div>
+            <div class="control-item">
+                <label for="csv">Csv document</label>
+                <input type="file" id="csv" />
+            </div>
+            <div class="control-item">
+                <label for="csv-encoding">Csv encoding</label>
+                <select name="csv-encoding" id="csv-encoding" ></select>
+            </div>
+            <div class="control-item">
+                <button onclick="readTitles()">Read csv line</button>
+            </div>
+            <div class="control-item">
+                <label for="output-file-template">File template</label>
+                <input id="output-file-template" type="text">
+            </div>
+            <div class="control-item">
+                <button onclick="generate()">Generate all documents</button>
+            </div>
+        </div>
+        <div id="csv-raw">
+            <pre></pre>
+        </div>
+
+        <script src="render.js" ></script>
+    </body>
+</html>

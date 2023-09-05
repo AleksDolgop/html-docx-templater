@@ -1,0 +1,36 @@
+{
+  "name": "electron-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron-forge start",
+    "start-dev": "nodemon -- exec electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "make-win": "electron-builder --win --x64"
+  },
+  "author": "Aleksandr Dolgopolov",
+  "license": "ISC",
+  "devDependencies": {
+    "@electron-forge/cli": "6.4.1",
+    "@electron-forge/maker-deb": "6.4.1",
+    "@electron-forge/maker-rpm": "6.4.1",
+    "@electron-forge/maker-squirrel": "6.4.1",
+    "@electron-forge/maker-zip": "6.4.1",
+    "@electron-forge/plugin-auto-unpack-natives": "6.4.1",
+    "electron": "26.1.0",
+    "electron-builder": "^24.6.4",
+    "nodemon": "3.0.1"
+  },
+  "dependencies": {
+    "docxtemplater": "3.38.0",
+    "dotenv": "16.3.1",
+    "electron-progressbar": "2.1.0",
+    "electron-squirrel-startup": "1.0.0",
+    "exceljs": "4.3.0",
+    "file-saver": "2.0.5",
+    "js-zip": "1.0.1",
+    "pizzip": "3.1.4"
+  }
+}
